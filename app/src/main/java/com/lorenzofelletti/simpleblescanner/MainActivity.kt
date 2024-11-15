@@ -2,11 +2,13 @@ package com.lorenzofelletti.simpleblescanner
 
 import android.Manifest
 import android.bluetooth.BluetoothManager
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +22,7 @@ import com.lorenzofelletti.simpleblescanner.blescanner.adapter.BleDeviceAdapter
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BleDevice
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BleScanCallback
 
+
 class MainActivity : AppCompatActivity() {
     private lateinit var btnStartScan: Button
 
@@ -29,6 +32,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bleScanManager: BleScanManager
 
     private lateinit var foundDevices: MutableList<BleDevice>
+
+    private lateinit var graph: Button
 
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,6 +99,13 @@ class MainActivity : AppCompatActivity() {
 
             // Checks if the required permissions are granted and starts the scan if so, otherwise it requests them
             permissionManager checkRequestAndDispatch BLE_PERMISSION_REQUEST_CODE
+        }
+        graph = findViewById(R.id.btn_graph)
+
+        //Assign a listener to your button
+        graph.setOnClickListener { //Start your second activity
+            val intent = Intent(this, SecondActivity::class.java)
+            startActivity(intent)
         }
     }
 
