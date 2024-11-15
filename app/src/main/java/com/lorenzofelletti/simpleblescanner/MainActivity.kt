@@ -59,8 +59,9 @@ class MainActivity : AppCompatActivity() {
         // RecyclerView handling
         val rvFoundDevices = findViewById<View>(R.id.rv_found_devices) as RecyclerView
         foundDevices = BleDevice.createBleDevicesList()
-        val adapter = BleDeviceAdapter(foundDevices)
+        val adapter = BleDeviceAdapter(foundDevices) {device -> handleDeviceButtonClick(device)}
         rvFoundDevices.adapter = adapter
+
         rvFoundDevices.layoutManager = LinearLayoutManager(this)
 
         // BleManager creation
@@ -120,6 +121,12 @@ class MainActivity : AppCompatActivity() {
         permissionManager.dispatchOnRequestPermissionsResult(requestCode, grantResults)
     }
 
+    private fun handleDeviceButtonClick(device: BleDevice) {
+        val intent = Intent(this, DeviceActivity::class.java)
+//                 putExtra(DeviceActivity.EXTRA_DEVICE, device)
+//             }
+        startActivity(intent)
+    }
     companion object {
         private val TAG = MainActivity::class.java.simpleName
 

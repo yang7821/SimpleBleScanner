@@ -1,13 +1,25 @@
 package com.lorenzofelletti.simpleblescanner.blescanner
 
+import android.Manifest
+import android.app.Application
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.annotation.RequiresPermission
+import androidx.core.app.ActivityCompat
 import com.lorenzofelletti.simpleblescanner.BuildConfig.DEBUG
+import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BleScanCallback
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 
+
+const val PERMISSION_BLUETOOTH_SCAN = "android.permission.BLUETOOTH_SCAN"
+const val PERMISSION_BLUETOOTH_CONNECT = "android.permission.BLUETOOTH_CONNECT"
 /**
  * A manager for bluetooth LE scanning..
  */
@@ -18,6 +30,8 @@ class BleScanManager(
 ) {
     private val btAdapter = btManager.adapter
     private val bleScanner = btAdapter.bluetoothLeScanner
+
+    private var activeConnection = MutableStateFlow<BLEDeviceConnection?>(null)
 
     var beforeScanActions: MutableList<() -> Unit> = mutableListOf()
     var afterScanActions: MutableList<() -> Unit> = mutableListOf()
@@ -65,6 +79,37 @@ class BleScanManager(
     private fun executeAfterScanActions() {
         executeListOfFunctions(afterScanActions)
     }
+
+//    @RequiresPermission(allOf = [PERMISSION_BLUETOOTH_CONNECT, PERMISSION_BLUETOOTH_SCAN])
+//    fun setActiveDevice(device: BluetoothDevice?) {
+//        activeConnection.value = device?.run { BLEDeviceConnection(application, device) }
+//    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun connectActiveDevice() {
+        activeConnection.value?.connect()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun disconnectActiveDevice() {
+        activeConnection.value?.disconnect()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun discoverActiveDeviceServices() {
+        activeConnection.value?.discoverServices()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun readPasswordFromActiveDevice() {
+        activeConnection.value?.readPassword()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun writeNameToActiveDevice() {
+        activeConnection.value?.writeName()
+    }
+
 
     companion object {
         private val TAG = BleScanManager::class.java.simpleName
