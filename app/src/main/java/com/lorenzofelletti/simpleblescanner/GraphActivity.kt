@@ -14,7 +14,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 
-class SecondActivity : AppCompatActivity() {
+class GraphActivity : AppCompatActivity() {
     private lateinit var graph: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,7 +75,7 @@ class SecondActivity : AppCompatActivity() {
         lineChart.animateX(1800, Easing.EaseInExpo)
 
         //Part11
-        val markerView = CustomMarker(this@SecondActivity, R.layout.marker_view)
+        val markerView = CustomMarker(this@GraphActivity, R.layout.marker_view)
         lineChart.marker = markerView
 
         graph = findViewById(R.id.btn_graph)

@@ -1,10 +1,75 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
+<!-- res/layout/activity_device.xml -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DeviceActivity">
+    android:fillViewport="true">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/button_connect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Connect" />
+
+        <TextView
+            android:id="@+id/text_device_connected"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Device connected: false"
+            android:layout_marginTop="8dp"/>
+
+        <Button
+            android:id="@+id/button_discover_services"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2. Discover Services"
+            android:enabled="false"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/text_services_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Discovered Services:"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_services"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="8dp" />
+
+        <Button
+            android:id="@+id/button_read_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="3. Read Password"
+            android:enabled="false"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/text_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Found password: "
+            android:layout_marginTop="8dp"/>
+
+
+        <Button
+            android:id="@+id/button_disconnect"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Disconnect"
+            android:layout_marginTop="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+    </LinearLayout>
+</ScrollView>

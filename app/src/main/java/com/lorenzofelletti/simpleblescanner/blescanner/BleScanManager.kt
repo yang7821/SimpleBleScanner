@@ -10,6 +10,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
+import androidx.compose.ui.window.application
 import androidx.core.app.ActivityCompat
 import com.lorenzofelletti.simpleblescanner.BuildConfig.DEBUG
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
@@ -23,6 +24,7 @@ const val PERMISSION_BLUETOOTH_CONNECT = "android.permission.BLUETOOTH_CONNECT"
 /**
  * A manager for bluetooth LE scanning..
  */
+
 class BleScanManager(
     btManager: BluetoothManager,
     private val scanPeriod: Long = DEFAULT_SCAN_PERIOD,
@@ -80,6 +82,7 @@ class BleScanManager(
         executeListOfFunctions(afterScanActions)
     }
 
+    @SuppressLint("MissingPermission")
 //    @RequiresPermission(allOf = [PERMISSION_BLUETOOTH_CONNECT, PERMISSION_BLUETOOTH_SCAN])
 //    fun setActiveDevice(device: BluetoothDevice?) {
 //        activeConnection.value = device?.run { BLEDeviceConnection(application, device) }

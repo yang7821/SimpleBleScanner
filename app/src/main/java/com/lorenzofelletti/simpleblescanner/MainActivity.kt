@@ -1,6 +1,7 @@
 package com.lorenzofelletti.simpleblescanner
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.content.Intent
 import android.os.Build
@@ -8,7 +9,6 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var graph: Button
 
+    @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         // BleManager creation
         btManager = getSystemService(BluetoothManager::class.java)
         bleScanManager = BleScanManager(btManager, 5000, scanCallback = BleScanCallback({
-            val name = it?.device?.address
+            val name = it?.device?.name
             if (name.isNullOrBlank()) return@BleScanCallback
 
             val device = BleDevice(name)
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         //Assign a listener to your button
         graph.setOnClickListener { //Start your second activity
-            val intent = Intent(this, SecondActivity::class.java)
+            val intent = Intent(this, GraphActivity::class.java)
             startActivity(intent)
         }
     }
@@ -123,8 +124,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleDeviceButtonClick(device: BleDevice) {
         val intent = Intent(this, DeviceActivity::class.java)
-//                 putExtra(DeviceActivity.EXTRA_DEVICE, device)
-//             }
         startActivity(intent)
     }
     companion object {
@@ -137,6 +136,7 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.ACCESS_COARSE_LOCATION,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.BLUETOOTH_CONNECT
         )
     }
 }
