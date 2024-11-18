@@ -69,7 +69,7 @@
             android:layout_height="wrap_content"
             android:text="Disconnect"
             android:layout_marginTop="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless" />
+             />
 
     </LinearLayout>
 </ScrollView>

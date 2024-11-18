@@ -39,7 +39,7 @@ class GraphActivity : AppCompatActivity() {
         entries.add(Entry(5f, 16f))
 
         //Part3
-        val vl = LineDataSet(entries, "Times I talked to your mother")
+        val vl = LineDataSet(entries, "Particles counted or something")
 
         //Part4
         vl.setDrawValues(false)

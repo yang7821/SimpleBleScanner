@@ -1,5 +1,7 @@
 package com.lorenzofelletti.simpleblescanner.blescanner.adapter
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,17 +10,18 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lorenzofelletti.simpleblescanner.R
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BleDevice
+import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Adapter for the RecyclerView that shows the found BLE devices.
  */
-class BleDeviceAdapter(
-    private val devices: List<BleDevice>,
-    private val onButtonClick: (BleDevice) -> Unit
-) : RecyclerView.Adapter<BleDeviceAdapter.ViewHolder>() {
+class BluetoothDeviceAdapter(
+    private var devices: List<BluetoothDevice>,
+    private val onButtonClick: (BluetoothDevice) -> Unit
+) : RecyclerView.Adapter<BluetoothDeviceAdapter.ViewHolder>() {
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val btnAction: Button = itemView.findViewById(R.id.btn_connect)
-        fun bind(device: BleDevice, onButtonClick: (BleDevice) -> Unit) {
+        fun bind(device: BluetoothDevice, onButtonClick: (BluetoothDevice) -> Unit) {
             btnAction.setOnClickListener {onButtonClick(device)}
         }
 
@@ -32,7 +35,7 @@ class BleDeviceAdapter(
         return ViewHolder(deviceView)
     }
 
-    override fun onBindViewHolder(holder: BleDeviceAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: BluetoothDeviceAdapter.ViewHolder, position: Int) {
         val device = devices[position]
         val textView = holder.deviceNameTextView
         textView.text = device.name
@@ -43,4 +46,8 @@ class BleDeviceAdapter(
         return devices.size
     }
 
+    fun submitList(newDevices: List<BluetoothDevice>) {
+        devices = newDevices.distinct()
+        notifyDataSetChanged()  // Notify the adapter that data has changed
+    }
 }

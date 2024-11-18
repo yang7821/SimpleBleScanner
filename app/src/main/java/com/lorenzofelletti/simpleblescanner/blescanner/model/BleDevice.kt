@@ -1,9 +1,14 @@
 package com.lorenzofelletti.simpleblescanner.blescanner.model
 
+import android.bluetooth.BluetoothDevice
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
 /**
  * A class that represents a BLE device.
  */
-data class BleDevice(val name: String) {
+@Parcelize
+data class BleDevice(val name: String, val address: String) : Parcelable{
     companion object {
         fun createBleDevicesList(): MutableList<BleDevice> {
             return mutableListOf()

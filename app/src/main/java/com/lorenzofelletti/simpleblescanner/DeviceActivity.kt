@@ -1,25 +1,23 @@
 package com.lorenzofelletti.simpleblescanner
 
-import android.Manifest
-import android.bluetooth.BluetoothManager
-import android.content.pm.PackageManager
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGattService
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.lorenzofelletti.simpleblescanner.BuildConfig.DEBUG
-import com.lorenzofelletti.simpleblescanner.blescanner.BleScanManager
 import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_CONNECT
-import com.lorenzofelletti.simpleblescanner.blescanner.adapter.BleDeviceAdapter
+import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_SCAN
+import com.lorenzofelletti.simpleblescanner.blescanner.adapter.ServiceAdapter
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
-import com.lorenzofelletti.simpleblescanner.blescanner.model.BleDevice
-import com.lorenzofelletti.simpleblescanner.blescanner.model.BleScanCallback
+import com.lorenzofelletti.simpleblescanner.blescanner.model.CTF_SERVICE_UUID
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 
 class DeviceActivity : AppCompatActivity() {
 
@@ -33,55 +31,97 @@ class DeviceActivity : AppCompatActivity() {
     private lateinit var buttonDisconnect: Button
 
     // Define your data and state variables
-    private var isDeviceConnected: Boolean = false
+    private lateinit var device: BluetoothDevice
     private var discoveredCharacteristics: Map<String, List<String>> = emptyMap()
-    private var password: String? = null
-    private var nameWrittenTimes: Int = 0
+    private var curServices: List<BluetoothGattService> = emptyList()
+    private var activeConnection = MutableStateFlow<BLEDeviceConnection?>(null)
 
-
-    private lateinit var bleScanManager: BleScanManager
-
+    val foundTargetService = discoveredCharacteristics.contains(CTF_SERVICE_UUID.toString())
+    @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device)
-
-        val bluetoothManager = getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-        bleScanManager = BleScanManager(bluetoothManager)
+        device = intent.getParcelableExtra("BLE Device")!!
+        discoveredCharacteristics = curServices.associate { service -> Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() }) }
         // Initialize UI components
         buttonConnect = findViewById(R.id.button_connect)
         textDeviceConnected = findViewById(R.id.text_device_connected)
         buttonDiscoverServices = findViewById(R.id.button_discover_services)
-        recyclerViewServices = findViewById(R.id.recycler_view_services)
+        recyclerViewServices = findViewById<RecyclerView>(R.id.recycler_view_services)
         buttonReadPassword = findViewById(R.id.button_read_password)
         textPassword = findViewById(R.id.text_password)
         buttonDisconnect = findViewById(R.id.button_disconnect)
 
         // Set up RecyclerView
+        val adapter = ServiceAdapter(discoveredCharacteristics)
+        recyclerViewServices.adapter = adapter
         recyclerViewServices.layoutManager = LinearLayoutManager(this)
-//        recyclerViewServices.adapter = ServicesAdapter(discoveredCharacteristics)
 
         // Set up button listeners
 
-        buttonConnect.setOnClickListener { if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            bleScanManager.connectActiveDevice() }
-        buttonDiscoverServices.setOnClickListener { if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            bleScanManager.discoverActiveDeviceServices() }
-        buttonReadPassword.setOnClickListener { if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.BLUETOOTH_CONNECT
-            ) != PackageManager.PERMISSION_GRANTED
-        )
-            bleScanManager.readPasswordFromActiveDevice() }
-        buttonDisconnect.setOnClickListener { bleScanManager.disconnectActiveDevice() }
+        buttonConnect.setOnClickListener {
+            setActiveDevice(device)
+            connectActiveDevice()
+        }
+        buttonDiscoverServices.setOnClickListener { discoverActiveDeviceServices() }
+        buttonReadPassword.setOnClickListener { readPasswordFromActiveDevice() }
+        buttonDisconnect.setOnClickListener { disconnectActiveDevice() }
 
+        lifecycleScope.launch {
+            activeConnection.collect { connection ->
+                connection?.isConnected?.collect { connected ->
+                    textDeviceConnected.text = "Device connected: $connected"
+                    buttonDiscoverServices.isEnabled = connected
+                    buttonDisconnect.isEnabled = connected
+                }
+            }
+        }
+        lifecycleScope.launch {
+            activeConnection.collect { service ->
+                service?.services?.collect { deviceServices ->
+                    curServices = deviceServices
+                }
+                discoveredCharacteristics = curServices.associate { service ->
+                    Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() })
+                }
 
+                (recyclerViewServices.adapter as ServiceAdapter).updateData(discoveredCharacteristics)
+            }
+        }
     }
+
+    @SuppressLint("MissingPermission")
+    @RequiresPermission(allOf = [PERMISSION_BLUETOOTH_CONNECT, PERMISSION_BLUETOOTH_SCAN])
+    fun setActiveDevice(device: BluetoothDevice?) {
+        activeConnection.value = device?.run {
+            BLEDeviceConnection(this@DeviceActivity, device)
+        }
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun connectActiveDevice() {
+        activeConnection.value?.connect()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun disconnectActiveDevice() {
+        activeConnection.value?.disconnect()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun discoverActiveDeviceServices() {
+        activeConnection.value?.discoverServices()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun readPasswordFromActiveDevice() {
+        activeConnection.value?.readPassword()
+    }
+
+    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+    fun writeNameToActiveDevice() {
+        activeConnection.value?.writeName()
+    }
+
+
 }

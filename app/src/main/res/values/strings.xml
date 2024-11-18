@@ -5,4 +5,5 @@
     <string name="ble_permission_rationale">This app needs to access bluetooth and location in order to scan for BLE devices.</string>
     <string name="ble_permissions_denied_message">Some permissions were not granted, please grant them and try again</string>
     <string name="title_activity_second_activitity">Historical Data</string>
+    <string name="connect">Connect</string>
 </resources>
