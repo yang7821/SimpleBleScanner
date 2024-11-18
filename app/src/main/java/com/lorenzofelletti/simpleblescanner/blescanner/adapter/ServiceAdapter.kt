@@ -1,6 +1,6 @@
 package com.lorenzofelletti.simpleblescanner.blescanner.adapter
 
-import android.util.Log
+import android.bluetooth.BluetoothGattService
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.lorenzofelletti.simpleblescanner.R
 
 class ServiceAdapter (
-    private var discoveredCharacteristics: Map<String, List<String>>
+    private var services: List<BluetoothGattService>
 ) : RecyclerView.Adapter<ServiceAdapter.ServiceViewHolder>() {
     inner class ServiceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textServiceUuid: TextView = itemView.findViewById(R.id.service_uuid)
@@ -18,9 +18,16 @@ class ServiceAdapter (
         /**
          * Binds the service and its characteristics to the UI elements.
          */
-        fun bind(serviceUuid: String, characteristics: List<String>) {
+        fun bind(service: BluetoothGattService) {
+            val serviceUuid = service.uuid.toString()
+            val characteristics = service.characteristics.map { it.uuid.toString() }
+
             textServiceUuid.text = "Service: $serviceUuid"
-            textCharacteristics.text = characteristics.joinToString(separator = "\n") { "- $it" }
+            textCharacteristics.text = if (characteristics.isNotEmpty()) {
+                characteristics.joinToString(separator = "\n") { "- $it" }
+            } else {
+                "No characteristics found."
+            }
         }
     }
 
@@ -30,16 +37,14 @@ class ServiceAdapter (
     }
 
     override fun onBindViewHolder(holder: ServiceViewHolder, position: Int) {
-        val serviceUuid = discoveredCharacteristics.keys.elementAt(position)
-        val characteristics = discoveredCharacteristics[serviceUuid].orEmpty()
-        Log.d("ServiceAdapter", "Binding service: $serviceUuid, Characteristics: $characteristics")
-        holder.bind(serviceUuid, characteristics)
+        val service = services[position]
+        holder.bind(service)
     }
 
-    override fun getItemCount(): Int = discoveredCharacteristics.size
+    override fun getItemCount(): Int = services.size
 
-    fun updateData(newData: Map<String, List<String>>) {
-        discoveredCharacteristics = newData
+    fun updateData(newServices: List<BluetoothGattService>) {
+        services = newServices
         notifyDataSetChanged() // Notify RecyclerView to refresh the list
     }
 

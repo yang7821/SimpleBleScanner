@@ -2,11 +2,7 @@ package com.lorenzofelletti.simpleblescanner
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Application
-import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -29,7 +25,6 @@ import com.lorenzofelletti.permissions.dispatcher.dsl.withRequestCode
 import com.lorenzofelletti.simpleblescanner.BuildConfig.DEBUG
 import com.lorenzofelletti.simpleblescanner.blescanner.BleScanManager
 import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_CONNECT
-import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_SCAN
 import com.lorenzofelletti.simpleblescanner.blescanner.adapter.BluetoothDeviceAdapter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

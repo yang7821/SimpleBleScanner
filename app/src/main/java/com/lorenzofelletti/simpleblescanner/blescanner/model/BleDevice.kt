@@ -1,6 +1,5 @@
 package com.lorenzofelletti.simpleblescanner.blescanner.model
 
-import android.bluetooth.BluetoothDevice
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 

@@ -1,6 +1,5 @@
 package com.lorenzofelletti.simpleblescanner.blescanner.adapter
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.view.LayoutInflater
 import android.view.View
@@ -9,8 +8,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.lorenzofelletti.simpleblescanner.R
-import com.lorenzofelletti.simpleblescanner.blescanner.model.BleDevice
-import kotlinx.coroutines.flow.MutableStateFlow
 
 /**
  * Adapter for the RecyclerView that shows the found BLE devices.
@@ -47,7 +44,7 @@ class BluetoothDeviceAdapter(
     }
 
     fun submitList(newDevices: List<BluetoothDevice>) {
-        devices = newDevices.distinct()
+        devices = newDevices.filter { !it.name.isNullOrEmpty() }.distinct()
         notifyDataSetChanged()  // Notify the adapter that data has changed
     }
 }

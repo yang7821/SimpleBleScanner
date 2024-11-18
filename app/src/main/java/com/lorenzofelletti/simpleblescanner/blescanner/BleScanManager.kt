@@ -1,6 +1,5 @@
 package com.lorenzofelletti.simpleblescanner.blescanner
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
@@ -8,8 +7,6 @@ import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import androidx.annotation.RequiresPermission
-import androidx.compose.ui.window.application
-import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 

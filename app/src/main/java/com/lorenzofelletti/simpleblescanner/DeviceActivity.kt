@@ -15,7 +15,6 @@ import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_CONN
 import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_SCAN
 import com.lorenzofelletti.simpleblescanner.blescanner.adapter.ServiceAdapter
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
-import com.lorenzofelletti.simpleblescanner.blescanner.model.CTF_SERVICE_UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -32,17 +31,14 @@ class DeviceActivity : AppCompatActivity() {
 
     // Define your data and state variables
     private lateinit var device: BluetoothDevice
-    private var discoveredCharacteristics: Map<String, List<String>> = emptyMap()
     private var curServices: List<BluetoothGattService> = emptyList()
     private var activeConnection = MutableStateFlow<BLEDeviceConnection?>(null)
 
-    val foundTargetService = discoveredCharacteristics.contains(CTF_SERVICE_UUID.toString())
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_device)
         device = intent.getParcelableExtra("BLE Device")!!
-        discoveredCharacteristics = curServices.associate { service -> Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() }) }
         // Initialize UI components
         buttonConnect = findViewById(R.id.button_connect)
         textDeviceConnected = findViewById(R.id.text_device_connected)
@@ -53,7 +49,7 @@ class DeviceActivity : AppCompatActivity() {
         buttonDisconnect = findViewById(R.id.button_disconnect)
 
         // Set up RecyclerView
-        val adapter = ServiceAdapter(discoveredCharacteristics)
+        val adapter = ServiceAdapter(emptyList())
         recyclerViewServices.adapter = adapter
         recyclerViewServices.layoutManager = LinearLayoutManager(this)
 
@@ -73,19 +69,20 @@ class DeviceActivity : AppCompatActivity() {
                     textDeviceConnected.text = "Device connected: $connected"
                     buttonDiscoverServices.isEnabled = connected
                     buttonDisconnect.isEnabled = connected
+
+                    if (!connected) {
+                        adapter.updateData(emptyList()) // Clear services
+                    }
                 }
             }
         }
-        lifecycleScope.launch {
-            activeConnection.collect { service ->
-                service?.services?.collect { deviceServices ->
-                    curServices = deviceServices
-                }
-                discoveredCharacteristics = curServices.associate { service ->
-                    Pair(service.uuid.toString(), service.characteristics.map { it.uuid.toString() })
-                }
 
-                (recyclerViewServices.adapter as ServiceAdapter).updateData(discoveredCharacteristics)
+        lifecycleScope.launch {
+            activeConnection.collect { device ->
+                device?.services?.collect { deviceServices ->
+                    curServices = deviceServices
+                    adapter.updateData(curServices)
+                }
             }
         }
     }
@@ -115,13 +112,13 @@ class DeviceActivity : AppCompatActivity() {
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun readPasswordFromActiveDevice() {
-        activeConnection.value?.readPassword()
+        activeConnection.value?.readCharacteristic()
     }
 
-    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun writeNameToActiveDevice() {
-        activeConnection.value?.writeName()
-    }
+//    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
+//    fun writeNameToActiveDevice() {
+//        activeConnection.value?.writeName()
+//    }
 
 
 }
