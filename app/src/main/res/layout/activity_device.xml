@@ -56,10 +56,11 @@
             android:layout_marginTop="16dp"/>
 
         <TextView
-            android:id="@+id/text_password"
+            android:id="@+id/text_character"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Found password: "
+            android:text="Characteristic value: "
+            android:textColor="@android:color/darker_gray"
             android:layout_marginTop="8dp"/>
 
 

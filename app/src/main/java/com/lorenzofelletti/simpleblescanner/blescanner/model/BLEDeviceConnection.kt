@@ -51,7 +51,14 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
         ) {
             super.onCharacteristicRead(gatt, characteristic, status)
             if (characteristic.uuid == CHARACTERISTIC_UUID) {
-                characteristicRead.value = String(characteristic.value)
+                val byteArray = characteristic.value
+                val number = byteArray.toByteValue()  // Use the appropriate conversion method
+
+                // Update the state with the formatted number
+                characteristicRead.value = "$number"
+
+                // Log the value for debugging
+                Log.v("bluetooth", "Characteristic read: $number")
             }
         }
 
@@ -96,14 +103,7 @@ class BLEDeviceConnection @RequiresPermission("PERMISSION_BLUETOOTH_CONNECT") co
         }
     }
 
-//    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-//    fun writeName() {
-//        val service = gatt?.getService(SERVICE_UUID)
-//        val characteristic = service?.getCharacteristic(NAME_CHARACTERISTIC_UUID)
-//        if (characteristic != null) {
-//            characteristic.value = "Tom".toByteArray()
-//            val success = gatt?.writeCharacteristic(characteristic)
-//            Log.v("bluetooth", "Write status: $success")
-//        }
-//    }
+    fun ByteArray.toByteValue(): Byte {
+        return this[0]
+    }
 }

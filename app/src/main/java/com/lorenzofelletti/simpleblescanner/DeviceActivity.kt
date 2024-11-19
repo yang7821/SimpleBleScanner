@@ -3,6 +3,7 @@ package com.lorenzofelletti.simpleblescanner
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGattService
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
@@ -25,8 +26,8 @@ class DeviceActivity : AppCompatActivity() {
     private lateinit var textDeviceConnected: TextView
     private lateinit var buttonDiscoverServices: Button
     private lateinit var recyclerViewServices: RecyclerView
-    private lateinit var buttonReadPassword: Button
-    private lateinit var textPassword: TextView
+    private lateinit var buttonReadCharateristic: Button
+    private lateinit var textCharacteristic: TextView
     private lateinit var buttonDisconnect: Button
 
     // Define your data and state variables
@@ -44,8 +45,8 @@ class DeviceActivity : AppCompatActivity() {
         textDeviceConnected = findViewById(R.id.text_device_connected)
         buttonDiscoverServices = findViewById(R.id.button_discover_services)
         recyclerViewServices = findViewById<RecyclerView>(R.id.recycler_view_services)
-        buttonReadPassword = findViewById(R.id.button_read_password)
-        textPassword = findViewById(R.id.text_password)
+        buttonReadCharateristic = findViewById(R.id.button_read_password)
+        textCharacteristic = findViewById(R.id.text_character)
         buttonDisconnect = findViewById(R.id.button_disconnect)
 
         // Set up RecyclerView
@@ -60,15 +61,22 @@ class DeviceActivity : AppCompatActivity() {
             connectActiveDevice()
         }
         buttonDiscoverServices.setOnClickListener { discoverActiveDeviceServices() }
-        buttonReadPassword.setOnClickListener { readPasswordFromActiveDevice() }
-        buttonDisconnect.setOnClickListener { disconnectActiveDevice() }
+        buttonReadCharateristic.setOnClickListener {
+            readCharacteristicFromActiveDevice()
+        }
+        buttonDisconnect.setOnClickListener {
+            disconnectActiveDevice()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
+        }
 
         lifecycleScope.launch {
-            activeConnection.collect { connection ->
-                connection?.isConnected?.collect { connected ->
+            activeConnection.collect { device ->
+                device?.isConnected?.collect { connected ->
                     textDeviceConnected.text = "Device connected: $connected"
                     buttonDiscoverServices.isEnabled = connected
                     buttonDisconnect.isEnabled = connected
+                    buttonReadCharateristic.isEnabled = connected
 
                     if (!connected) {
                         adapter.updateData(emptyList()) // Clear services
@@ -85,7 +93,17 @@ class DeviceActivity : AppCompatActivity() {
                 }
             }
         }
+
+        lifecycleScope.launch {
+            activeConnection.collect { device ->
+                device?.characteristicRead?.collect { value ->
+                    textCharacteristic.text = "Characteristic value: $value"
+                }
+            }
+        }
     }
+
+
 
     @SuppressLint("MissingPermission")
     @RequiresPermission(allOf = [PERMISSION_BLUETOOTH_CONNECT, PERMISSION_BLUETOOTH_SCAN])
@@ -111,7 +129,7 @@ class DeviceActivity : AppCompatActivity() {
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-    fun readPasswordFromActiveDevice() {
+    fun readCharacteristicFromActiveDevice() {
         activeConnection.value?.readCharacteristic()
     }
 
