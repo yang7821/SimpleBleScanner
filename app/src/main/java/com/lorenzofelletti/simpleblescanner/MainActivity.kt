@@ -3,6 +3,7 @@ package com.lorenzofelletti.simpleblescanner
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGattService
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -25,7 +26,9 @@ import com.lorenzofelletti.permissions.dispatcher.dsl.withRequestCode
 import com.lorenzofelletti.simpleblescanner.BuildConfig.DEBUG
 import com.lorenzofelletti.simpleblescanner.blescanner.BleScanManager
 import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_CONNECT
+import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_SCAN
 import com.lorenzofelletti.simpleblescanner.blescanner.adapter.BluetoothDeviceAdapter
+import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -37,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var foundDevices: MutableStateFlow<List<BluetoothDevice>>
 
-    private lateinit var graph: Button
+//    private lateinit var graph: Button
 
     private lateinit var bleScanManager: BleScanManager
 
@@ -85,13 +88,13 @@ class MainActivity : AppCompatActivity() {
             // Checks if the required permissions are granted and starts the scan if so, otherwise it requests them
             permissionManager checkRequestAndDispatch BLE_PERMISSION_REQUEST_CODE
         }
-        graph = findViewById(R.id.btn_graph)
+//        graph = findViewById(R.id.btn_graph)
 
         //Assign a listener to your button
-        graph.setOnClickListener { //Start your second activity
-            val intent = Intent(this, GraphActivity::class.java)
-            startActivity(intent)
-        }
+//        graph.setOnClickListener { //Start your second activity
+//            val intent = Intent(this, GraphActivity::class.java)
+//            startActivity(intent)
+//        }
 
         lifecycleScope.launch {
             foundDevices.collect { devices ->
@@ -114,7 +117,7 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("Missing Permissions")
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     private fun handleDeviceButtonClick(device: BluetoothDevice) {
-        val intent = Intent(this, DeviceActivity::class.java)
+        val intent = Intent(this, GraphActivity::class.java)
         intent.putExtra("BLE Device", device)
         startActivity(intent)
     }

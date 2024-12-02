@@ -51,7 +51,7 @@
             android:id="@+id/button_read_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="3. Read Password"
+            android:text="3. Read Characteristic"
             android:enabled="false"
             android:layout_marginTop="16dp"/>
 

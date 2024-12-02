@@ -16,10 +16,14 @@ import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_CONN
 import com.lorenzofelletti.simpleblescanner.blescanner.PERMISSION_BLUETOOTH_SCAN
 import com.lorenzofelletti.simpleblescanner.blescanner.adapter.ServiceAdapter
 import com.lorenzofelletti.simpleblescanner.blescanner.model.BLEDeviceConnection
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.util.Timer
+import kotlin.concurrent.schedule
 
 class DeviceActivity : AppCompatActivity() {
+    private var timer: Timer? = null
 
     // Define your UI components
     private lateinit var buttonConnect: Button
@@ -44,7 +48,7 @@ class DeviceActivity : AppCompatActivity() {
         buttonConnect = findViewById(R.id.button_connect)
         textDeviceConnected = findViewById(R.id.text_device_connected)
         buttonDiscoverServices = findViewById(R.id.button_discover_services)
-        recyclerViewServices = findViewById<RecyclerView>(R.id.recycler_view_services)
+        recyclerViewServices = findViewById(R.id.recycler_view_services)
         buttonReadCharateristic = findViewById(R.id.button_read_password)
         textCharacteristic = findViewById(R.id.text_character)
         buttonDisconnect = findViewById(R.id.button_disconnect)
@@ -54,16 +58,18 @@ class DeviceActivity : AppCompatActivity() {
         recyclerViewServices.adapter = adapter
         recyclerViewServices.layoutManager = LinearLayoutManager(this)
 
+        startRepeatingTask()
         // Set up button listeners
+        setActiveDevice(device)
+        connectActiveDevice()
+        discoverActiveDeviceServices()
 
         buttonConnect.setOnClickListener {
             setActiveDevice(device)
             connectActiveDevice()
         }
         buttonDiscoverServices.setOnClickListener { discoverActiveDeviceServices() }
-        buttonReadCharateristic.setOnClickListener {
-            readCharacteristicFromActiveDevice()
-        }
+        buttonReadCharateristic.setOnClickListener { readCharacteristicFromActiveDevice() }
         buttonDisconnect.setOnClickListener {
             disconnectActiveDevice()
             val intent = Intent(this, MainActivity::class.java)
@@ -104,6 +110,15 @@ class DeviceActivity : AppCompatActivity() {
     }
 
 
+    @SuppressLint("MissingPermission")
+    private fun startRepeatingTask() {
+        timer = Timer()
+        timer?.schedule(0, 1000) { // Delay 0ms, repeat every 1000ms (1 second)
+            runOnUiThread {
+                readCharacteristicFromActiveDevice()
+            }
+        }
+    }
 
     @SuppressLint("MissingPermission")
     @RequiresPermission(allOf = [PERMISSION_BLUETOOTH_CONNECT, PERMISSION_BLUETOOTH_SCAN])
@@ -116,6 +131,7 @@ class DeviceActivity : AppCompatActivity() {
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
     fun connectActiveDevice() {
         activeConnection.value?.connect()
+        activeConnection.value?.discoverServices()
     }
 
     @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
@@ -132,11 +148,5 @@ class DeviceActivity : AppCompatActivity() {
     fun readCharacteristicFromActiveDevice() {
         activeConnection.value?.readCharacteristic()
     }
-
-//    @RequiresPermission(PERMISSION_BLUETOOTH_CONNECT)
-//    fun writeNameToActiveDevice() {
-//        activeConnection.value?.writeName()
-//    }
-
 
 }

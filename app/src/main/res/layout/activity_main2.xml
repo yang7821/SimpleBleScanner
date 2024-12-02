@@ -11,7 +11,7 @@
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChart"
         android:layout_width="match_parent"
-        android:layout_height="358dp"
+        android:layout_height="400dp"
         android:layout_marginTop="16dp"
         android:background="@drawable/gradient_bg"
         android:padding="9dp"
@@ -23,12 +23,45 @@
         android:id="@+id/btn_graph"
         android:layout_width="125dp"
         android:layout_height="56dp"
-        android:layout_marginTop="508dp"
+        android:layout_marginTop="632dp"
         android:text="Switch to devices"
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvoc"
+        android:layout_width="395dp"
+        android:layout_height="61dp"
+        android:layout_marginTop="32dp"
+        android:text="Current reading: "
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lineChart" />
+
+    <Button
+        android:id="@+id/service_button"
+        android:layout_width="125dp"
+        android:layout_height="50dp"
+        android:text="Connect"
+        app:layout_constraintBottom_toTopOf="@+id/btn_graph"
+        app:layout_constraintEnd_toStartOf="@+id/refresh_btn"
+        app:layout_constraintHorizontal_bias="0.38"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvoc"
+        app:layout_constraintVertical_bias="0.512" />
+
+    <Button
+        android:id="@+id/refresh_btn"
+        android:layout_width="125dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="44dp"
+        android:text="Refresh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvoc" />
 
 
     <!--    <TextView-->
