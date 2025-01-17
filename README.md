@@ -1,5 +1,5 @@
-## SimpleBleScanner
-This is a simple BLE scanner for Android.
-It asks for the required permissions and scans for BLE devices for 5 seconds.
+## BLE Air Quality Monitor App for Senior Design
+This connects to a VOC sensor via BLE.
 
-It displays the address of the devices found.
+It displays the devices found and upon selecting the related sensor (AGS02MA) displays a graph of the historical data read from the sensor and the current reading of VOCs.
+
